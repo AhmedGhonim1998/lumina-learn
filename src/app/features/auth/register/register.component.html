@@ -1,0 +1,38 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-extrabold text-blue-600">Create Account</h2>
+      <p class="text-gray-500 mt-2">Join Lumina Learn today</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Email Address</label>
+        <input formControlName="email" type="email" 
+               class="w-full mt-2 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none">
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Password</label>
+        <input formControlName="password" type="password" 
+               class="w-full mt-2 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none">
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Confirm Password</label>
+        <input formControlName="confirmPassword" type="password" 
+               class="w-full mt-2 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none">
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid"
+              class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-blue-700 active:scale-[0.98] transition-all disabled:bg-gray-300">
+        Sign Up
+      </button>
+    </form>
+
+    <div class="mt-8 text-center text-gray-600">
+      Already have an account? 
+      <a routerLink="/login" class="text-blue-600 font-bold hover:underline">Login</a>
+    </div>
+  </div>
+</div>

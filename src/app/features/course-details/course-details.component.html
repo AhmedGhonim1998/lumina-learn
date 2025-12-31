@@ -1,0 +1,10 @@
+<div *ngIf="course$ | async as course" class="max-w-4xl mx-auto p-8">
+  <img [src]="course.imageUrl" class="w-full h-64 object-cover rounded-3xl shadow-lg mb-8">
+  <h1 class="text-4xl font-bold mb-4">{{ course.title }}</h1>
+  <p class="text-xl text-gray-600 mb-6">Instructor: {{ course.instructor }}</p>
+  
+  <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+    <h3 class="font-bold text-blue-800 mb-2">What you'll learn:</h3>
+    <p class="text-gray-700">Detailed curriculum and videos will appear here soon!</p>
+  </div>
+</div>

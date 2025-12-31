@@ -1,0 +1,49 @@
+<div class="bg-gray-50 min-h-screen py-12 px-6 lg:px-12">
+  <div class="max-w-7xl mx-auto mb-12 text-center">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Explore Our World-Class Courses</h1>
+    <p class="text-gray-600 max-w-2xl mx-auto">
+      Start your journey today by picking a course designed by industry experts.
+    </p>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <div *ngFor="let course of courses$ | async" 
+         class="group bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col">
+      
+      <div class="relative h-52 overflow-hidden">
+        <img [src]="course.imageUrl || 'https://via.placeholder.com/400x200'" 
+             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+             [alt]="course.title">
+        <div class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+          {{ course.category || 'Professional' }}
+        </div>
+      </div>
+
+      <div class="p-6 flex-grow">
+        <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+          {{ course.title }}
+        </h3>
+        <p class="text-gray-600 text-sm line-clamp-2 mb-4">
+          {{ course.description }}
+        </p>
+        
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+          <span class="text-xs font-medium text-gray-500 italic">By Expert Instructor</span>
+        </div>
+      </div>
+
+      <div class="p-6 pt-0 mt-auto border-t border-gray-50 flex items-center justify-between">
+        <span class="text-2xl font-black text-gray-900">${{ course.price || 'Free' }}</span>
+        <button [routerLink]="['/course', course.id]" 
+                class="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-600 transition-all active:scale-95 shadow-md">
+          View Details
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="(courses$ | async)?.length === 0" class="text-center py-20">
+    <p class="text-gray-400 text-lg">No courses available at the moment. Check back soon!</p>
+  </div>
+</div>
