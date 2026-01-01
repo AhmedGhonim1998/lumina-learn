@@ -7,6 +7,7 @@ import { adminGuard } from './core/guards/auth.guard';
 import { CourseDetailsComponent } from './features/course-details/course-details.component';
 import { HomeComponent } from './features/home/home.component';
 import { CourseCatalogComponent } from './features/course-catalog/course-catalog.component';
+import { ProfileComponent } from './features/profile/profile.component';
 export const routes: Routes = [
   // 1. الصفحة الرئيسية هي أول شيء
   { path: '', component: HomeComponent }, 
@@ -32,5 +33,6 @@ export const routes: Routes = [
   },
 
 { path: 'courses', component: CourseCatalogComponent },
+{ path: 'profile', component: ProfileComponent },
 { path: '**', redirectTo: '' }
 ];
