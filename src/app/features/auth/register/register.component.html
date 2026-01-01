@@ -29,7 +29,10 @@
         Sign Up
       </button>
     </form>
-
+    <p *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched" 
+   class="text-red-500 text-xs mt-1">
+   ❌ Passwords do not match!
+</p>
     <div class="mt-8 text-center text-gray-600">
       Already have an account? 
       <a routerLink="/login" class="text-blue-600 font-bold hover:underline">Login</a>
