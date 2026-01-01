@@ -1,3 +1,38 @@
-<p>
-  my-courses works!
-</p>
+<div class="min-h-screen bg-gray-50 py-12 px-4">
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold text-gray-900">My Learning Library 📚</h1>
+      <p class="text-gray-500">All the courses you've enrolled in.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let course of enrolledCourses$ | async" 
+           class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col hover:-translate-y-1 transition-all duration-300">
+        
+        <img [src]="course.imageUrl" class="h-48 w-full object-cover">
+        
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Purchased</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">{{ course.title }}</h3>
+          <p class="text-gray-500 text-sm mb-6 line-clamp-2">You started this journey on {{ course.purchaseDate | date:'mediumDate' }}</p>
+          
+          <button [routerLink]="['/watch', course.id]" 
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl">
+  Watch Now
+</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="(enrolledCourses$ | async)?.length === 0" class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+      <div class="text-5xl mb-4">🛡️</div>
+      <h2 class="text-xl font-bold text-gray-800">No courses yet!</h2>
+      <p class="text-gray-500 mb-6">Explore our catalog and start your first course today.</p>
+      <button routerLink="/courses" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold">Browse Courses</button>
+    </div>
+
+  </div>
+</div>

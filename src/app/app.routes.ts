@@ -8,6 +8,9 @@ import { CourseDetailsComponent } from './features/course-details/course-details
 import { HomeComponent } from './features/home/home.component';
 import { CourseCatalogComponent } from './features/course-catalog/course-catalog.component';
 import { ProfileComponent } from './features/profile/profile.component';
+import { MyCoursesComponent } from './features/my-courses/my-courses.component';
+import { CoursePlayerComponent } from './features/course-player/course-player.component';
+import { authUserGuard } from './core/guards/auth-user.guard';
 export const routes: Routes = [
   // 1. الصفحة الرئيسية هي أول شيء
   { path: '', component: HomeComponent }, 
@@ -34,5 +37,15 @@ export const routes: Routes = [
 
 { path: 'courses', component: CourseCatalogComponent },
 { path: 'profile', component: ProfileComponent },
+{ 
+  path: 'my-courses', 
+  component: MyCoursesComponent, 
+  canActivate: [authUserGuard] 
+},
+{ 
+  path: 'watch/:id', 
+  component: CoursePlayerComponent, 
+  canActivate: [authUserGuard] // <--- كدة الطالب والأدمن يقدروا يدخلوا
+},
 { path: '**', redirectTo: '' }
 ];

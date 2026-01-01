@@ -23,38 +23,42 @@
     </div>
 
     <div [class.hidden]="!isMenuOpen" class="items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all">
-      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-50 rounded-2xl bg-gray-50 md:space-x-8 md:flex-row md:mt-0 md:border-0 md:bg-transparent text-gray-700">
-        <li>
-          <a routerLink="/" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" [routerLinkActiveOptions]="{exact: true}" class="block py-2 px-3 hover:text-blue-600 transition">Home</a>
-        </li>
-        <li>
-          <a routerLink="/courses" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" class="block py-2 px-3 hover:text-blue-600 transition">All Courses</a>
-        </li>
-        
-        <li *ngIf="isLoggedIn && userRole === 'admin'" class="flex items-center">
-  <a routerLink="/dashboard" 
-     (click)="isMenuOpen=false" 
-     routerLinkActive="text-blue-600" 
-     class="block py-2 px-3 text-blue-600 font-bold transition-all hover:opacity-80 leading-none">
-    Instructor Panel
-  </a>
-</li>
-        <li class="md:hidden mt-4 border-t pt-4">
-          <button *ngIf="!isLoggedIn" routerLink="/login" (click)="isMenuOpen=false" class="w-full bg-blue-600 text-white py-2 rounded-xl">Login</button>
-          <button *ngIf="isLoggedIn" (click)="logout()" class="w-full text-red-500 py-2">Logout Account</button>
-        </li>
-        <li *ngIf="isLoggedIn" class="relative">
-  <a routerLink="/profile" class="flex items-center p-2 text-gray-700 hover:text-blue-600 transition-all">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-    <span *ngIf="(cartCount$ | async) as count" 
-          class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
-      {{ count }}
-    </span>
-  </a>
-</li>
-      </ul>
+      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-50 rounded-2xl bg-gray-50 md:space-x-8 md:flex-row md:mt-0 md:border-0 md:bg-transparent text-gray-700 items-center">
+  <li>
+    <a routerLink="/" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" [routerLinkActiveOptions]="{exact: true}" class="block py-2 px-3 hover:text-blue-600 transition">Home</a>
+  </li>
+
+  <li>
+    <a routerLink="/courses" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" class="block py-2 px-3 hover:text-blue-600 transition">All Courses</a>
+  </li>
+
+  <li *ngIf="isLoggedIn">
+    <a routerLink="/my-courses" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" class="block py-2 px-3 hover:text-blue-600 transition">My Courses</a>
+  </li>
+  
+  <li *ngIf="isLoggedIn && userRole === 'admin'">
+    <a routerLink="/dashboard" (click)="isMenuOpen=false" routerLinkActive="text-blue-600" class="block py-2 px-3 text-blue-600 font-bold transition-all hover:opacity-80">
+      Instructor Panel
+    </a>
+  </li>
+
+  <li *ngIf="isLoggedIn" class="relative py-2 md:py-0">
+    <a routerLink="/profile" (click)="isMenuOpen=false" class="flex items-center p-2 text-gray-700 hover:text-blue-600 transition-all bg-gray-100 md:bg-transparent rounded-full">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <span *ngIf="(cartCount$ | async) as count" 
+            class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
+        {{ count }}
+      </span>
+      <span class="md:hidden ml-2 font-medium">My Cart</span> </a>
+  </li>
+
+  <li class="md:hidden w-full mt-4 border-t pt-4">
+    <button *ngIf="!isLoggedIn" routerLink="/login" (click)="isMenuOpen=false" class="w-full bg-blue-600 text-white py-2 rounded-xl">Login</button>
+    <button *ngIf="isLoggedIn" (click)="logout()" class="w-full text-red-500 py-2 font-bold">Logout Account</button>
+  </li>
+</ul>
     </div>
   </div>
 </nav>
