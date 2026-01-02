@@ -11,23 +11,63 @@
   </div>
 
   <div class="w-full lg:w-96 bg-gray-800 border-l border-gray-700 p-6 overflow-y-auto">
+    
+    <div class="mb-6 bg-gray-900/50 p-4 rounded-2xl border border-gray-700" *ngIf="(lessons$ | async) as allLessons">
+      <div class="flex justify-between items-center mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+        <span>Progress</span>
+        <span class="text-blue-400">{{ watchedLessons.length }} / {{ allLessons.length }} Lessons</span>
+      </div>
+      <div class="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
+        <div class="bg-blue-500 h-full transition-all duration-700 ease-out" 
+             [style.width.%]="(watchedLessons.length / allLessons.length) * 100">
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">🔍</span>
+        <input [(ngModel)]="searchQuery" type="text" placeholder="Search lessons..." 
+               class="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white">
+      </div>
+    </div>
+
     <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
       <span class="text-blue-500">📋</span> Course Content
     </h2>
     
     <div class="space-y-3">
-  <div *ngFor="let lesson of lessons$ | async; let i = index" 
-       (click)="selectLesson(lesson)"
-       [ngClass]="activeLessonTitle === lesson.title ? 'bg-blue-600 border-blue-400' : 'bg-gray-700/50 hover:bg-gray-700'"
-       class="p-4 rounded-xl cursor-pointer transition-all border border-transparent">
-    
-    <div class="flex items-center gap-3">
-      <span *ngIf="activeLessonTitle === lesson.title" class="animate-pulse">▶️</span>
-      <span class="text-xs text-gray-400">Lesson {{ i + 1 }}</span>
-    </div>
-    <p class="font-medium mt-1">{{ lesson.title }}</p>
-  </div>
+      <div *ngFor="let lesson of (lessons$ | async); let i = index" 
+           (click)="selectLesson(lesson)"
+           [hidden]="searchQuery && !lesson.title.toLowerCase().includes(searchQuery.toLowerCase())"
+           [ngClass]="activeLessonTitle === lesson.title ? 'bg-blue-600 border-blue-400 shadow-lg' : 'bg-gray-700/50 hover:bg-gray-700 border-transparent'"
+           class="p-4 rounded-xl cursor-pointer transition-all border relative group">
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-6 h-6 flex items-center justify-center">
+               <span *ngIf="activeLessonTitle === lesson.title" class="animate-pulse">▶️</span>
+               <span *ngIf="isWatched(lesson.id) && activeLessonTitle !== lesson.title" class="text-green-500">✅</span>
+               <span *ngIf="!isWatched(lesson.id) && activeLessonTitle !== lesson.title" class="text-gray-500 text-[10px] font-bold">{{ i + 1 }}</span>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium leading-tight" [ngClass]="{'text-white': activeLessonTitle === lesson.title, 'text-gray-300': activeLessonTitle !== lesson.title}">
+                {{ lesson.title }}
+              </p>
+              <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Video Lesson</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="searchQuery" class="text-center py-4">
+    <ng-container *ngIf="(lessons$ | async) as lessons">
+        <p *ngIf="!(lessons | json).toLowerCase().includes(searchQuery.toLowerCase())" class="text-gray-500 text-sm">
+            No lessons found
+        </p>
+    </ng-container>
 </div>
+    </div>
   </div>
-
 </div>
