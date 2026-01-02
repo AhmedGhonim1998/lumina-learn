@@ -11,6 +11,7 @@ import { ProfileComponent } from './features/profile/profile.component';
 import { MyCoursesComponent } from './features/my-courses/my-courses.component';
 import { CoursePlayerComponent } from './features/course-player/course-player.component';
 import { authUserGuard } from './core/guards/auth-user.guard';
+import { CheckoutComponent } from './features/checkout/checkout.component';
 export const routes: Routes = [
   // 1. الصفحة الرئيسية هي أول شيء
   { path: '', component: HomeComponent }, 
@@ -47,5 +48,6 @@ export const routes: Routes = [
   component: CoursePlayerComponent, 
   canActivate: [authUserGuard] // <--- كدة الطالب والأدمن يقدروا يدخلوا
 },
+{ path: 'checkout/:id', component: CheckoutComponent, canActivate: [authUserGuard] },
 { path: '**', redirectTo: '' }
 ];

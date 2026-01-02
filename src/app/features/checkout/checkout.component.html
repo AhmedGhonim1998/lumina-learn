@@ -1,0 +1,101 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+    
+    <div class="space-y-6">
+      <h2 class="text-3xl font-extrabold text-gray-900">Checkout Summary</h2>
+      
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div *ngIf="course && courseId !== 'cart'" class="flex gap-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+          <img [src]="course.imageUrl" class="w-24 h-24 object-cover rounded-xl shadow-sm">
+          <div class="flex flex-col justify-center">
+            <h3 class="font-bold text-gray-800 text-lg">{{ course.title }}</h3>
+            <p class="text-blue-600 font-black text-xl">${{ course.price }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="courseId === 'cart'" class="space-y-4">
+            <p class="text-gray-500 font-medium">Buying all items in your cart...</p>
+            </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 space-y-3">
+          <div class="flex justify-between text-gray-500">
+            <span>Subtotal</span>
+            <span class="font-semibold text-gray-800">${{ course?.price || 'Cart Total' }}</span>
+          </div>
+          <div class="flex justify-between text-gray-500">
+            <span>Tax (VAT 0%)</span>
+            <span>$0.00</span>
+          </div>
+          <div class="flex justify-between text-2xl font-black text-gray-900 pt-2">
+            <span>Total Amount</span>
+            <span class="text-blue-600">${{ course?.price || '...' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 p-4 bg-green-50 rounded-2xl border border-green-100">
+        <span class="text-2xl">🔒</span>
+        <p class="text-sm text-green-800 font-medium">Your payment is secured with 256-bit SSL encryption. We don't store your card details.</p>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div *ngIf="isProcessing" class="absolute inset-0 bg-white/90 backdrop-blur-md z-50 rounded-3xl flex flex-col items-center justify-center border-2 border-blue-500">
+        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-6 text-xl font-bold text-blue-600 animate-pulse">Verifying Transaction...</p>
+        <p class="text-gray-400 text-sm mt-2">Connecting to secure bank gateway</p>
+      </div>
+
+      <div class="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100">
+        <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+          <span class="bg-gray-100 p-2 rounded-lg">💳</span>
+          Payment Details
+        </h2>
+
+        <div class="space-y-5">
+          <div>
+            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Cardholder Name</label>
+            <input [(ngModel)]="cardInfo.name" type="text" placeholder="FULL NAME" 
+                   class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Card Number</label>
+            <div class="relative">
+                <input [(ngModel)]="cardInfo.number" type="text" placeholder="0000 0000 0000 0000" 
+                       class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">💳</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+  <label class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Expiry Date</label>
+  <input [(ngModel)]="cardInfo.expiry" 
+         type="text" 
+         (input)="formatExpiry($event)"
+         maxlength="5"
+         placeholder="MM / YY" 
+         class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+</div>
+            <div>
+              <label class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">CVV / CVC</label>
+              <input [(ngModel)]="cardInfo.cvv" type="password" placeholder="***" 
+                     class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+            </div>
+          </div>
+
+          <div class="pt-6">
+            <button (click)="handlePayment()" 
+                    [disabled]="!cardInfo.number || !cardInfo.name || isProcessing"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-blue-200 hover:shadow-blue-300 active:scale-[0.98] transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:shadow-none">
+              Complete Purchase
+            </button>
+            <p class="text-center text-gray-400 text-xs mt-4">By clicking complete, you agree to our terms of service.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

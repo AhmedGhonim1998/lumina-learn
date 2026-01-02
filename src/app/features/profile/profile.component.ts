@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Firestore, collection, collectionData, doc, deleteDoc, writeBatch, getDocs } from '@angular/fire/firestore';
 import { Auth, authState } from '@angular/fire/auth';
 import { Observable, of, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -16,7 +17,7 @@ export class ProfileComponent implements OnInit {
   totalPrice: number = 0;
   userName: string = '';
 
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(private auth: Auth, private firestore: Firestore, private router: Router) {}
 
  ngOnInit() {
   // مراقبة حالة المستخدم وجلب سلته
@@ -60,48 +61,9 @@ export class ProfileComponent implements OnInit {
   }
 
 
-  async checkout() {
-  const user = this.auth.currentUser;
-  if (!user) return;
-
-  try {
-    // 1. الحصول على كل العناصر الموجودة في السلة حالياً
-    const cartRef = collection(this.firestore, `users/${user.uid}/cart`);
-    const cartSnapshot = await getDocs(cartRef);
-
-    if (cartSnapshot.empty) {
-      alert('Your cart is empty!');
-      return;
-    }
-
-    // 2. استخدام "Batch" عشان ننفذ كل العمليات مرة واحدة (أسرع وأضمن)
-    const batch = writeBatch(this.firestore);
-
-    cartSnapshot.forEach((docSnapshot) => {
-      const courseData = docSnapshot.data();
-      const courseId = docSnapshot.id;
-
-      // أ- إضافة الكورس لكوليكشن "enrolledCourses"
-      const enrolledRef = doc(this.firestore, `users/${user.uid}/enrolledCourses`, courseId);
-      batch.set(enrolledRef, {
-        ...courseData,
-        purchaseDate: new Date().toISOString()
-      });
-
-      // ب- مسح الكورس من السلة
-      batch.delete(docSnapshot.ref);
-    });
-
-    // 3. تنفيذ العمليات
-    await batch.commit();
-
-    alert('🎉 Congratulations! You are now enrolled in these courses.');
-    // ممكن تنقله لصفحة الكورسات المشتراه هنا
-    // this.router.navigate(['/my-courses']);
-
-  } catch (error) {
-    console.error('Checkout failed:', error);
-    alert('Something went wrong during checkout.');
-  }
+async checkout() {
+  // بننقل اليوزر لصفحة الـ checkout وبنبعت له كلمة 'cart' كـ ID
+  // عشان نعرف صفحة الدفع إننا بنشتري السلة كلها مش كورس واحد
+  this.router.navigate(['/checkout', 'cart']);
 }
 }
