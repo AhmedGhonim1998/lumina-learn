@@ -99,7 +99,4 @@ async forceFullLogout() {
   // توجيه لصفحة اللوجين العادية لضمان إعادة بناء الواجهة (Navbar/Profile)
   this.router.navigate(['/login'], { queryParams: { loggedOut: true } });
 }
-
-
-
 }
