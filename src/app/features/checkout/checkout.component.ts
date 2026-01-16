@@ -17,7 +17,7 @@ export class CheckoutComponent implements OnInit {
   private router = inject(Router);
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  private http = inject(HttpClient); // تأكد من إضافة HttpClientProvider في app.config
+  private http = inject(HttpClient); 
 
   courseId: string | null = null;
   course: any = null;
@@ -49,7 +49,6 @@ export class CheckoutComponent implements OnInit {
         return;
     }
 
-    // تأكد أن السعر موجود ومحول لقروش بشكل صحيح
     const price = this.course?.price || 100; 
     const amountInCents = Math.round(price * 100).toString();
 
@@ -85,16 +84,18 @@ export class CheckoutComponent implements OnInit {
                             "postal_code": "NA", "city": "NA", "country": "NA", "last_name": "User", "state": "NA"
                         },
                         "currency": "EGP",
-                        "integration_id": 5470857 // رقم التكامل من صورتك
+                        "integration_id": 5470857 
                     };
 
                     this.http.post<any>('https://accept.paymob.com/api/acceptance/payment_keys', paymentKeyData).subscribe({
                         next: (res3) => {
-                            const finalToken = res3.token;
-                            const iframeId = 997128; // رقم الأي فريم من صورتك
-                            
-                            // توجيه العميل مع ربط الـ Token والـ Iframe
+                            // --- التعديل هنا ---
+                            const finalToken = res3.token; // استخراج التوكن من الرد
+                            const iframeId = 997128; 
+
+                            // التوجيه للرابط الصحيح
                             window.location.href = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?has_parent_fp=false&payment_token=${finalToken}&iframe_id=${iframeId}`;
+                            // -----------------
                         },
                         error: (err) => this.handleError(err)
                     });
@@ -109,7 +110,7 @@ export class CheckoutComponent implements OnInit {
   private handleError(err: any) {
     this.isProcessing = false;
     console.error("Paymob Error:", err);
-    alert("حدث خطأ في الاتصال ببوابة الدفع. تأكد من إيقاف الـ CORS.");
+    alert("حدث خطأ في الاتصال ببوابة الدفع. تأكد من تفعيل إضافة CORS في المتصفح.");
   }
 
   formatExpiry(event: any) {
