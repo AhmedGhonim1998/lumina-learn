@@ -45,69 +45,66 @@ export class CheckoutComponent implements OnInit {
   async handlePayment() {
     const user = this.auth.currentUser;
     if (!user) {
-      alert('Please login first');
-      return;
+        alert('Please login first');
+        return;
     }
 
-    if (!this.course && this.courseId !== 'cart') {
-      alert('Course data not loaded yet');
-      return;
-    }
+    // تأكد أن السعر موجود ومحول لقروش بشكل صحيح
+    const price = this.course?.price || 100; 
+    const amountInCents = Math.round(price * 100).toString();
 
     this.isProcessing = true;
 
-    // 1. طلب الـ Token الأساسي
     const authData = { "api_key": "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRFeU1qa3dPU3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS5zZGVoQURxM0d0YTN0UlQ5RWVkMVV6VlVQb2ctSWZoWnBGRjJQVzlMdTl5b0tXd3dzWThGQnRXQ3F4T2ZxT0xNM2tlUDBiM2pXTi0wTnFONmhza19Ddw==" };
     
     this.http.post<any>('https://accept.paymob.com/api/auth/tokens', authData).subscribe({
-      next: (res1) => {
-        const authToken = res1.token;
+        next: (res1) => {
+            const authToken = res1.token;
 
-        // 2. تسجيل الطلب (نستخدم سعر الكورس المتاح)
-        const amount = this.course ? this.course.price : 100; // قيمة افتراضية لو سلة
-        const orderData = {
-          "auth_token": authToken,
-          "delivery_needed": "false",
-          "amount_cents": (amount * 100).toString(),
-          "currency": "EGP",
-          "items": []
-        };
-
-        this.http.post<any>('https://accept.paymob.com/api/ecommerce/orders', orderData).subscribe({
-          next: (res2) => {
-            const orderId = res2.id;
-
-            // 3. طلب مفتاح الدفع
-            const paymentKeyData = {
-              "auth_token": authToken,
-              "amount_cents": (amount * 100).toString(),
-              "expiration": 3600,
-              "order_id": orderId,
-              "billing_data": {
-                "apartment": "NA", "email": user.email || "test@test.com", "floor": "NA", 
-                "first_name": user.displayName || "Guest", "street": "NA", "building": "NA", 
-                "phone_number": "01012345678", "shipping_method": "NA", 
-                "postal_code": "NA", "city": "NA", "country": "NA", "last_name": "User", "state": "NA"
-              },
-              "currency": "EGP",
-              "integration_id": 5470857
+            const orderData = {
+                "auth_token": authToken,
+                "delivery_needed": "false",
+                "amount_cents": amountInCents,
+                "currency": "EGP",
+                "items": []
             };
 
-            this.http.post<any>('https://accept.paymob.com/api/accept/payment_keys', paymentKeyData).subscribe({
-              next: (res3) => {
-                const finalToken = res3.token;
-                // 4. التوجيه لصفحة Paymob
-                window.location.href = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?has_parent_fp=false&payment_token=${finalToken}`;
-              },
-              error: (err) => this.handleError(err)
+            this.http.post<any>('https://accept.paymob.com/api/ecommerce/orders', orderData).subscribe({
+                next: (res2) => {
+                    const orderId = res2.id;
+
+                    const paymentKeyData = {
+                        "auth_token": authToken,
+                        "amount_cents": amountInCents,
+                        "expiration": 3600,
+                        "order_id": orderId,
+                        "billing_data": {
+                            "apartment": "NA", "email": user.email || "test@test.com", "floor": "NA", 
+                            "first_name": user.displayName?.split(' ')[0] || "Guest", "street": "NA", "building": "NA", 
+                            "phone_number": "01012345678", "shipping_method": "NA", 
+                            "postal_code": "NA", "city": "NA", "country": "NA", "last_name": "User", "state": "NA"
+                        },
+                        "currency": "EGP",
+                        "integration_id": 5470857 // رقم التكامل من صورتك
+                    };
+
+                    this.http.post<any>('https://accept.paymob.com/api/accept/payment_keys', paymentKeyData).subscribe({
+                        next: (res3) => {
+                            const finalToken = res3.token;
+                            const iframeId = 997128; // رقم الأي فريم من صورتك
+                            
+                            // توجيه العميل مع ربط الـ Token والـ Iframe
+                            window.location.href = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?has_parent_fp=false&payment_token=${finalToken}&iframe_id=${iframeId}`;
+                        },
+                        error: (err) => this.handleError(err)
+                    });
+                },
+                error: (err) => this.handleError(err)
             });
-          },
-          error: (err) => this.handleError(err)
-        });
-      },
-      error: (err) => this.handleError(err)
+        },
+        error: (err) => this.handleError(err)
     });
-  }
+}
 
   private handleError(err: any) {
     this.isProcessing = false;
