@@ -94,7 +94,7 @@ next: (res3) => {
     const iframeId = 997128; 
 
     // جرب هذا الرابط (المسار المباشر للأي فريم)
-    const url = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}`;
+    const url = `https://portal.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}`;
     
     // أو هذا الرابط إذا كان حسابك إصدار حديث جداً:
     // const url = `https://portal.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}&iframe_id=${iframeId}`;
