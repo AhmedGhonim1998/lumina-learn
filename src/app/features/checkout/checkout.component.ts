@@ -88,7 +88,7 @@ export class CheckoutComponent implements OnInit {
                         "integration_id": 5470857 // رقم التكامل من صورتك
                     };
 
-                    this.http.post<any>('https://accept.paymob.com/api/accept/payment_keys', paymentKeyData).subscribe({
+                    this.http.post<any>('https://accept.paymob.com/api/acceptance/payment_keys', paymentKeyData).subscribe({
                         next: (res3) => {
                             const finalToken = res3.token;
                             const iframeId = 997128; // رقم الأي فريم من صورتك
