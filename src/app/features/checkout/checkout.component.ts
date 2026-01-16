@@ -88,15 +88,19 @@ export class CheckoutComponent implements OnInit {
                     };
 
                     this.http.post<any>('https://accept.paymob.com/api/acceptance/payment_keys', paymentKeyData).subscribe({
-                        next: (res3) => {
-                            // --- التعديل هنا ---
-                            const finalToken = res3.token; // استخراج التوكن من الرد
-                            const iframeId = 997128; 
+                        // الخطوة 4 المعدلة كلياً لتجاوز الـ 404
+next: (res3) => {
+    const finalToken = res3.token;
+    const iframeId = 997128; 
 
-                            // التوجيه للرابط الصحيح
-                            window.location.href = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?has_parent_fp=false&payment_token=${finalToken}&iframe_id=${iframeId}`;
-                            // -----------------
-                        },
+    // جرب هذا الرابط (المسار المباشر للأي فريم)
+    const url = `https://accept.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}`;
+    
+    // أو هذا الرابط إذا كان حسابك إصدار حديث جداً:
+    // const url = `https://portal.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}&iframe_id=${iframeId}`;
+
+    window.location.href = url;
+},
                         error: (err) => this.handleError(err)
                     });
                 },
