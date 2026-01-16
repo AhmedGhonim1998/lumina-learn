@@ -1,10 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'; // ضيفنا RouterModule
+
+import { 
+  Firestore, 
+  doc, 
+  getDoc, 
+  collection, 
+  getDocs, 
+  writeBatch 
+} from '@angular/fire/firestore'; // تأكد من وجود getDocs و writeBatch هنا
 import { Auth } from '@angular/fire/auth';
+import confetti from 'canvas-confetti'; // تأكد إنك عملت npm install canvas-confetti
 
 @Component({
   selector: 'app-checkout',
@@ -17,7 +25,6 @@ export class CheckoutComponent implements OnInit {
   private router = inject(Router);
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  private http = inject(HttpClient); 
 
   courseId: string | null = null;
   course: any = null;
@@ -33,6 +40,7 @@ export class CheckoutComponent implements OnInit {
   async ngOnInit() {
     this.courseId = this.route.snapshot.paramMap.get('id');
     
+    // لو بنشتري كورس واحد بس (مش من السلة)
     if (this.courseId && this.courseId !== 'cart') {
       const courseRef = doc(this.firestore, `courses/${this.courseId}`);
       const snap = await getDoc(courseRef);
@@ -42,87 +50,87 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
+
+
+  
+
   async handlePayment() {
     const user = this.auth.currentUser;
     if (!user) {
-        alert('Please login first');
-        return;
+      alert('Please login first');
+      return;
     }
-
-    const price = this.course?.price || 100; 
-    const amountInCents = Math.round(price * 100).toString();
 
     this.isProcessing = true;
 
-    const authData = { "api_key": "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRFeU1qa3dPU3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS5zZGVoQURxM0d0YTN0UlQ5RWVkMVV6VlVQb2ctSWZoWnBGRjJQVzlMdTl5b0tXd3dzWThGQnRXQ3F4T2ZxT0xNM2tlUDBiM2pXTi0wTnFONmhza19Ddw==" };
-    
-    this.http.post<any>('https://accept.paymob.com/api/auth/tokens', authData).subscribe({
-        next: (res1) => {
-            const authToken = res1.token;
+    setTimeout(async () => {
+      try {
+        const cartRef = collection(this.firestore, `users/${user.uid}/cart`);
+        const cartSnapshot = await getDocs(cartRef);
 
-            const orderData = {
-                "auth_token": authToken,
-                "delivery_needed": "false",
-                "amount_cents": amountInCents,
-                "currency": "EGP",
-                "items": []
-            };
+        const batch = writeBatch(this.firestore);
 
-            this.http.post<any>('https://accept.paymob.com/api/ecommerce/orders', orderData).subscribe({
-                next: (res2) => {
-                    const orderId = res2.id;
+        if (!cartSnapshot.empty) {
+          // حالة الشراء من السلة
+          cartSnapshot.forEach((docSnapshot) => {
+            const courseData = docSnapshot.data();
+            const cId = courseData['id'] || docSnapshot.id; // الوصول للاسم بين قوسين
 
-                    const paymentKeyData = {
-                        "auth_token": authToken,
-                        "amount_cents": amountInCents,
-                        "expiration": 3600,
-                        "order_id": orderId,
-                        "billing_data": {
-                            "apartment": "NA", "email": user.email || "test@test.com", "floor": "NA", 
-                            "first_name": user.displayName?.split(' ')[0] || "Guest", "street": "NA", "building": "NA", 
-                            "phone_number": "01012345678", "shipping_method": "NA", 
-                            "postal_code": "NA", "city": "NA", "country": "NA", "last_name": "User", "state": "NA"
-                        },
-                        "currency": "EGP",
-                        "integration_id": 5470857 
-                    };
-
-                    this.http.post<any>('https://accept.paymob.com/api/acceptance/payment_keys', paymentKeyData).subscribe({
-                        // الخطوة 4 المعدلة كلياً لتجاوز الـ 404
-next: (res3) => {
-    const finalToken = res3.token;
-    const iframeId = 997128; 
-
-    // جرب هذا الرابط (المسار المباشر للأي فريم)
-    const url = `https://portal.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}`;
-    
-    // أو هذا الرابط إذا كان حسابك إصدار حديث جداً:
-    // const url = `https://portal.paymob.com/api/accept/payments/visacard/activated.html?payment_token=${finalToken}&iframe_id=${iframeId}`;
-
-    window.location.href = url;
-},
-                        error: (err) => this.handleError(err)
-                    });
-                },
-                error: (err) => this.handleError(err)
+            const enrolledRef = doc(this.firestore, `users/${user.uid}/enrolledCourses`, cId);
+            batch.set(enrolledRef, {
+              ...courseData,
+              purchaseDate: new Date().toISOString(),
+              status: 'active'
             });
-        },
-        error: (err) => this.handleError(err)
-    });
-}
 
-  private handleError(err: any) {
-    this.isProcessing = false;
-    console.error("Paymob Error:", err);
-    alert("حدث خطأ في الاتصال ببوابة الدفع. تأكد من تفعيل إضافة CORS في المتصفح.");
+            batch.delete(docSnapshot.ref);
+          });
+        } else if (this.courseId && this.course) {
+          // حالة شراء كورس واحد مباشر
+          const enrolledRef = doc(this.firestore, `users/${user.uid}/enrolledCourses`, this.courseId);
+          batch.set(enrolledRef, {
+            ...this.course,
+            courseId: this.courseId,
+            purchaseDate: new Date().toISOString(),
+            status: 'active'
+          });
+        }
+
+        await batch.commit();
+
+        this.isProcessing = false;
+        
+        // تأثير الاحتفال
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        alert('🎉 Payment Successful!');
+        this.router.navigate(['/my-courses']);
+
+      } catch (error) {
+        this.isProcessing = false;
+        console.error('Checkout failed:', error);
+        alert('Payment failed, please try again.');
+      }
+    }, 2000);
   }
 
   formatExpiry(event: any) {
-    let input = event.target.value.replace(/\D/g, '');
-    if (input.length > 2) {
-      input = input.substring(0, 2) + '/' + input.substring(2, 4);
-    }
-    this.cardInfo.expiry = input;
-    event.target.value = input;
+  let input = event.target.value;
+  
+  // 1. مسح أي حاجة مش أرقام
+  input = input.replace(/\D/g, '');
+
+  // 2. إضافة السلاش بعد أول رقمين (الشهر)
+  if (input.length > 2) {
+    input = input.substring(0, 2) + '/' + input.substring(2, 4);
   }
+
+  // 3. تحديث القيمة في الـ Model والـ Input
+  this.cardInfo.expiry = input;
+  event.target.value = input;
+}
 }
